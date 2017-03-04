@@ -15,7 +15,17 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from twitter_app.views import index, login_view, logout_view, signup, public, submit, users, follow
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^$', index, name='index'),
+    url(r'^login$', login_view, name='login_view'),
+    url(r'^logout$', logout_view, name='logout_view'),
+    url(r'^signup$', signup, name='signup'),
+    url(r'^tweets$', public, name='public'),
+    url(r'^submit$', submit, name='submit'),
+    url(r'^users/$', users, name='users'),
+    url(r'^users/(?P<username>\w{0,30})/$', users, name='users'),
+    url(r'^follow$', follow, name='follow'),
 ]
