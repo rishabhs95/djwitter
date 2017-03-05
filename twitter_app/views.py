@@ -5,23 +5,22 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
-from twitter_app.forms import AuthenticateForm, UserCreateForm, twitterForm
-from twitter_app.models import twitter
-
+from twitter_app.forms import AuthenticateForm, UserCreateForm, tweetForm
+from twitter_app.models import tweet
 # Create your views here.
 
 def index(request, auth_form=None, user_form=None):
     # User is logged in
     if request.user.is_authenticated():
-        twitter_form = twitterForm()
+        tweet_form = tweetForm()
         user = request.user
-        tweets_self = twitter.objects.filter(user=user.id)
-        tweets_buddies = twitter.objects.filter(user__userprofile__in=user.profile.follows.all())
+        tweets_self = tweet.objects.filter(user=user.id)
+        tweets_buddies = tweet.objects.filter(user__userprofile__in=user.profile.follows.all())
         tweets = tweets_self | tweets_buddies
 
         return render(request,
                       'buddies.html',
-                      {'twitter_form': twitter_form, 'user': user,
+                      {'tweet_form': tweet_form, 'user': user,
                        'tweets': tweets,
                        'next_url': '/', })
     else:
@@ -70,53 +69,53 @@ def signup(request):
 @login_required
 def submit(request):
     if request.method == "POST":
-        twitter_form = twitterForm(data=request.POST)
+        tweet_form = tweetForm(data=request.POST)
         next_url = request.POST.get("next_url", "/")
-        if twitter_form.is_valid():
-            twitter = twitter_form.save(commit=False)
-            twitter.user = request.user
-            twitter.save()
+        if tweet_form.is_valid():
+            tweet = tweet_form.save(commit=False)
+            tweet.user = request.user
+            tweet.save()
             return redirect(next_url)
         else:
-            return public(request, twitter_form)
+            return public(request, tweet_form)
     return redirect('/')
 
 @login_required
-def public(request, twitter_form=None):
-    twitter_form = twitter_form or twitterForm()
-    tweets = twitter.objects.reverse()[:10]
+def public(request, tweet_form=None):
+    tweet_form = tweet_form or tweetForm()
+    tweets = tweet.objects.reverse()[:10]
     return render(request,
                   'public.html',
-                  {'twitter_form': twitter_form, 'next_url': '/tweets',
+                  {'tweet_form': tweet_form, 'next_url': '/tweets',
                    'tweets': tweets, 'username': request.user.username})
 
 def get_latest(user):
     try:
-        return user.twitter_set.order_by('-id')[0]
+        return user.tweet_set.order_by('-id')[0]
     except IndexError:
         return ""
 
 @login_required
-def users(request, username="", twitter_form=None):
+def users(request, username="", tweet_form=None):
     if username:
         # Show a profile
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
             raise Http404
-        tweets = twitter.objects.filter(user=user.id)
+        tweets = tweet.objects.filter(user=user.id)
         if username == request.user.username or request.user.profile.follows.filter(user__username=username):
             # Self Profile or buddies' profile
             return render(request, 'user.html', {'user': user, 'tweets': tweets, })
         return render(request, 'user.html', {'user': user, 'tweets': tweets, 'follow': True, })
-    users = User.objects.all().annotate(tweet_count=Count('twitter'))
+    users = User.objects.all().annotate(tweet_count=Count('tweet'))
     tweets = map(get_latest, users)
     obj = zip(users, tweets)
-    twitter_form = twitter_form or twitterForm()
+    tweet_form = tweet_form or tweetForm()
     return render(request,
                   'profiles.html',
                   {'obj': obj, 'next_url': '/users/',
-                   'twitter_form': twitter_form,
+                   'tweet_form': tweet_form,
                    'username': request.user.username, })
 
 @login_required

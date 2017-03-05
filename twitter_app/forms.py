@@ -2,7 +2,7 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 from django import forms
 from django.utils.html import strip_tags
-from twitter_app.models import twitter
+from twitter_app.models import tweet
 
 class UserCreateForm(UserCreationForm):
     email = forms.EmailField(required=True, widget=forms.widgets.TextInput(attrs={'placeholder': 'Email'}))
@@ -35,18 +35,16 @@ class AuthenticateForm(AuthenticationForm):
                 self.fields[f].widget.attrs.update({'class': 'error', 'value': strip_tags(error)})
         return form
 
-class twitterForm(forms.ModelForm):
-    content = forms.CharField(required=True, widget=forms.widgets.Textarea(attrs={'class': 'twitterText'}))
+class tweetForm(forms.ModelForm):
+    content = forms.CharField(required=True, widget=forms.widgets.Textarea(attrs={'class': 'tweetText'}))
 
     def is_valid(self):
-        form = super(twitterForm, self).is_valid()
+        form = super(tweetForm, self).is_valid()
         for f in self.errors.keys():
             if f != '__all__':
-                self.fields[f].widget.attrs.update({'class': 'error twitterText'})
+                self.fields[f].widget.attrs.update({'class': 'error tweetText'})
         return form
 
     class Meta:
-        model = twitter
+        model = tweet
         exclude = ('user',)
-
-
