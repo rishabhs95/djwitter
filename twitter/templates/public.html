@@ -5,7 +5,7 @@
         <h1>Create a Tweet</h1>
         <p>
             <form action="/submit" method="post">
-            {% for field in twitter_form %}{% csrf_token %}
+            {% for field in tweet_form %}{% csrf_token %}
             {{ field }}
             {% endfor %}
             <input type="hidden" value="{{ next_url }}" name="next_url">
@@ -17,7 +17,7 @@
         <h1>Public Tweets</h1>
         {% for tweet in tweets %}
         <div class="twitterWrapper">
-            <img class="avatar" src="{{ twitter.user.profile.gravatar_url }}">
+            <img class="avatar" src="{{ tweet.user.profile.gravatar_url }}">
             <span class="name">{{ tweet.user.first_name }}</span>@{{ tweet.user.username }}
             <span class="time">{{ tweet.creation_date|timesince }}</span>
             <p>{{ tweet.content }}</p>

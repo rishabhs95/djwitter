@@ -5,7 +5,7 @@
         <h1>Create a Tweet</h1>
         <p>
             <form action="/submit" method="post">
-            {% for field in twitter_form %}{% csrf_token %}
+            {% for field in tweet_form %}{% csrf_token %}
             {{ field }}
             {% endfor %}
             <input type="hidden" value="{{ next_url }}" name="next_url">

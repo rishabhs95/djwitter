@@ -7,10 +7,10 @@
  
 {% block content %}
     <div class="panel right">
-        <h1>Create a Twitter</h1>
+        <h1>Create a Tweet</h1>
         <p>
             <form action="/submit" method="post">
-            {% for field in twitter_form %}{% csrf_token %}
+            {% for field in tweet_form %}{% csrf_token %}
             {{ field }}
             {% endfor %}
             <input type="hidden" value="{{ next_url }}" name="next_url">
@@ -22,7 +22,7 @@
         <h1>Buddies' Tweets</h1>
         {% for tweet in tweets %}
         <div class="twitterWrapper">
-            <a href="/users/{{ twitter.user.username }}">
+            <a href="/users/{{ tweet.user.username }}">
                 <span class="name">{{ tweet.user.first_name }}</span>
             </a>
             @{{ tweet.user.username }}
